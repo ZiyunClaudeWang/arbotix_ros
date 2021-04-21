@@ -86,6 +86,9 @@ class ArbotixROS(ArbotiX):
                 self.getPosition(i+1)
             self.write(253, P_BAUD_RATE, [16])
             '''
+            while (True):
+                if (self.getPosition(1) != -1):
+                    break;
         else:
             rospy.loginfo("ArbotiX being simulated.")
 
@@ -95,6 +98,8 @@ class ArbotixROS(ArbotiX):
             joint_type = rospy.get_param("~joints/"+name+"/type", "dynamixel")
             if joint_type == "dynamixel":
                 self.joints[name] = DynamixelServo(self, name)
+            elif joint_type == "dynamixel_wheel":
+                self.joints[name] = DynamixelWheel(self, name)
             elif joint_type == "hobby_servo":
                 self.joints[name] = HobbyServo(self, name)
             elif joint_type == "calibrated_linear":
