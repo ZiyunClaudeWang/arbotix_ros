@@ -232,6 +232,7 @@ class DynamixelServo(Joint):
 
     def commandCb(self, req):
         """ Float64 style command input. """
+        #print("enabled: ", self.enabled, self.controller)
         if self.enabled:
             if self.controller and self.controller.active():
                 # Under and action control, do not interfere

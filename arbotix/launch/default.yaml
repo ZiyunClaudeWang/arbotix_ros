@@ -1,0 +1,14 @@
+port: /dev/ttyUSB0
+baud: 115200
+rate: 15
+joints: {
+    head_pan_joint: {type: dynamixel, id: 1}
+}
+
+#dynamixels: {
+#    head_pan_joint_foo: {id: 1}
+#}
+
+controllers: {
+  head_controller: {type: follow_controller, joints: [head_pan_joint], action_name: head_controller/follow_joint_trajectory }
+}

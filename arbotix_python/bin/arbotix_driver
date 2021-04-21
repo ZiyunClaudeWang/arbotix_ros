@@ -58,6 +58,7 @@ class ArbotixROS(ArbotiX):
         # load configurations    
         port = rospy.get_param("~port", "/dev/ttyUSB0")
         baud = int(rospy.get_param("~baud", "115200"))
+
         timeout = float(rospy.get_param("~timeout", "0.1"))
 
         self.rate = rospy.get_param("~rate", 100.0)
@@ -71,9 +72,20 @@ class ArbotixROS(ArbotiX):
         self.joint_state_publisher = JointStatePublisher()
 
         # start an arbotix driver; differ port opening to properly handle connection failures
+        print("baud", baud, self.fake)
         if not self.fake:
             ArbotiX.__init__(self, port, baud, timeout, open_port=True)
             self.connectArbotiX()
+            #self.write(253, P_BAUD_RATE, [16])
+            #self.write(1, P_BAUD_RATE, [16])
+
+            # TODO: there is a hack!!!!!
+            '''
+            self._ser.timeout = .25
+            for i in range(10):
+                self.getPosition(i+1)
+            self.write(253, P_BAUD_RATE, [16])
+            '''
         else:
             rospy.loginfo("ArbotiX being simulated.")
 
@@ -93,6 +105,7 @@ class ArbotixROS(ArbotiX):
         controllers = rospy.get_param("~controllers", dict())
         for name, params in controllers.items():
             try:
+                #import pdb; pdb.set_trace()
                 controller = controller_types[params["type"]](self, name)
                 self.controllers.append( controller )
                 pause = pause or controller.pause

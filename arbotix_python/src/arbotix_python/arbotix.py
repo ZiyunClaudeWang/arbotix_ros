@@ -58,6 +58,7 @@ class ArbotiX:
         self._ser.port = port
         self._ser.baudrate = baud
         self._ser.timeout = timeout
+        #print("baudrate", baud, "port", port)
 
         if open_port:
             self._ser.open()
@@ -66,6 +67,7 @@ class ArbotiX:
         self.error = 0
 
     def __write__(self, msg):
+        #print("msg", msg)
         try:
             self._ser.write(msg)
         except serial.SerialException as e:
@@ -93,6 +95,7 @@ class ArbotiX:
         except Exception as e:
             print(e)
             return None
+        #print("getPacket", d)
         # need a positive byte
         if not d or d == '':
             return None
@@ -147,6 +150,7 @@ class ArbotiX:
     ##
     ## @return The return packet, if read.
     def execute(self, index, ins, params, ret=True):
+        #print("execute")
         values = None
         self._mutex.acquire()  
         try:      
@@ -181,6 +185,7 @@ class ArbotiX:
     ## @return A list of the bytes read, or -1 if failure.
     def read(self, index, start, length):
         values = self.execute(index, AX_READ_DATA, [start, length])
+        #print("reading from ", index, " ", values)
         if values == None:
             return -1        
         else:
@@ -196,6 +201,7 @@ class ArbotiX:
     ##
     ## @return The error level.
     def write(self, index, start, values):
+        #print("Wrting to index {}, start {}, values {}".format(index, start, values))
         self.execute(index, AX_WRITE_DATA, [start] + values)
         return self.error     
 
@@ -241,6 +247,7 @@ class ArbotiX:
     ##
     ## @return A list of bytes read.
     def syncRead(self, servos, start, length):
+        #print("syncRead ", servos)
         return self.execute(0xFE, AX_SYNC_READ, [start, length] + servos )
     
     ## @brief Set baud rate of a device.
