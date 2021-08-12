@@ -94,6 +94,7 @@ class DynamixelWheel(Joint):
         rospy.Service(name+'/relax', Relax, self.relaxCb)
         rospy.Service(name+'/enable', Enable, self.enableCb)
         rospy.Service(name+'/set_speed', SetSpeed, self.setSpeedCb)
+        print("Init...... Dynamxiel Wheel")
 
     def interpolate(self, frame):
         """ Get the new position to move to, in ticks. """
@@ -607,7 +608,7 @@ class ServoController(Controller):
 
         # steal some servos
         for joint in device.joints.values():
-            if isinstance(joint, DynamixelServo):
+            if isinstance(joint, DynamixelServo) or isinstance(joint, DynamixelWheel):
                 self.dynamixels.append(joint)
             elif isinstance(joint, HobbyServo):
                 self.hobbyservos.append(joint)
@@ -722,7 +723,7 @@ class ServoWheelController(Controller):
 
         # steal some servos
         for joint in device.joints.values():
-            if isinstance(joint, DynamixelServo):
+            if isinstance(joint, DynamixelServo) or isinstance(joint, DynamixelWheel):
                 self.dynamixels.append(joint)
             elif isinstance(joint, HobbyServo):
                 self.hobbyservos.append(joint)
@@ -740,6 +741,7 @@ class ServoWheelController(Controller):
         """ Read servo positions, update them. """
         if rospy.Time.now() > self.r_next and not self.fake:
             if self.device.use_sync_read:
+                print(rospy.Time.now())
                 # arbotix/servostik/wifi board sync_read
                 synclist = list()
                 for joint in self.dynamixels:
@@ -775,10 +777,12 @@ class ServoWheelController(Controller):
                     v = joint.interpolate(1.0/self.w_delta.to_sec())
                     if v != None:   # if was dirty      
                         self.device.setPosition(joint.id, int(v))
+            '''
             for joint in self.hobbyservos: 
                 v = joint.interpolate(1.0/self.w_delta.to_sec())
                 if v != None:   # if it was dirty   
                     self.device.setServo(joint.id, v)
+            '''
             self.w_next = rospy.Time.now() + self.w_delta
 
     def getDiagnostics(self):
