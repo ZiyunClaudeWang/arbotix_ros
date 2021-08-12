@@ -1,0 +1,5 @@
+<launch>
+  <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen"  clear_params="true">
+    <rosparam file="$(find arbotix_python)/launch/turret.yaml" command="load" />
+  </node>
+</launch>

@@ -1,0 +1,7 @@
+port: /dev/ttyUSB_WIDOWX
+baud: 115200
+rate: 15
+joints: {
+    head_pan_joint: {type: dynamixel_wheel, id: 1}
+}
+
