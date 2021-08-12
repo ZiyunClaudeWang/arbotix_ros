@@ -1,8 +1,10 @@
-port: /dev/ttyUSB1
+port: /dev/ttyUSB0
 baud: 115200
-rate: 15
+rate: 20
+read_rate: 60
+sync_read: false
 joints: {
-    head_pan_joint: {type: dynamixel_wheel, id: 1}
+    head_pan_joint: {type: dynamixel_wheel, id: 1, ticks: 4096 }
 }
 
 #dynamixels: {
