@@ -1,5 +1,5 @@
 <launch>
   <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen"  clear_params="true">
-    <rosparam file="/home/claude/catkin_ws/src/arbotix_ros/arbotix/launch/default.yaml" command="load" />
+    <rosparam file="$(find arbotix_python)/launch/default.yaml" command="load" />
   </node>
 </launch>

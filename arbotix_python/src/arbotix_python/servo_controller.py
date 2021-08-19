@@ -84,8 +84,15 @@ class DynamixelWheel(Joint):
         self.temperature = 0.0
 
         # first disable wheel mode on start
-        self.spinning = False
-        self.device.disableWheelMode(self.id, resolution=12)
+        spin_on_start = rospy.get_param(n+"spin_on_start", False)
+        print("spin_on_start is ", spin_on_start)
+
+        if not spin_on_start:
+            self.device.disableWheelMode(self.id, resolution=12)
+            self.spinning = False
+        else:
+            self.spin()
+            self.spinning = True
         
         # ROS interfaces
         # disable positional control
@@ -250,6 +257,24 @@ class DynamixelWheel(Joint):
                 self.active = True
                 self.desired = req.data
                 
+    def spin(self):
+        print("Changing to wheel mode")
+        '''
+        self.spin = req.data
+        self.device.enableWheelMode(self.id)
+        self.device.setSpeed(self.id, 100)
+        '''
+        self.device.write( int(1), P_CW_ANGLE_LIMIT_L, [0, 0])
+        self.device.write( int(1), P_CCW_ANGLE_LIMIT_L, [0, 0])
+        self.device.write( int(1), 70, [0, 0])
+        self.device.setSpeed(int(1), 30)
+
+    def stop_spin(self):
+        limit = 4095
+        self.device.write( int(1), P_CW_ANGLE_LIMIT_L, [4095%256, 4095>>8])
+        self.device.write( int(1), P_CCW_ANGLE_LIMIT_L, [4095%256, 4095>>8])
+        self.device.write( int(1), 70, [0, 0])
+
     def spinCb(self, req):
         """ Bool style command input. """
         if self.enabled:
@@ -257,22 +282,9 @@ class DynamixelWheel(Joint):
                 # Under and action control, do not interfere
                 return
             elif req.data == True:
-                print("Changing to wheel mode")
-                '''
-                self.spin = req.data
-                self.device.enableWheelMode(self.id)
-                self.device.setSpeed(self.id, 100)
-                '''
-                self.device.write( int(1), P_CW_ANGLE_LIMIT_L, [0, 0])
-                self.device.write( int(1), P_CCW_ANGLE_LIMIT_L, [0, 0])
-                self.device.write( int(1), 70, [0, 0])
-                self.device.setSpeed(int(1), 100)
-
+                self.spin()
             elif req.data == False:
-                limit = 4095
-                self.device.write( int(1), P_CW_ANGLE_LIMIT_L, [4095%256, 4095>>8])
-                self.device.write( int(1), P_CCW_ANGLE_LIMIT_L, [4095%256, 4095>>8])
-                self.device.write( int(1), 70, [0, 0])
+                self.stop_spin()
                 
     def setSpeedCb(self, req):
         """ Set servo speed. Requested speed is in radians per second.
